@@ -1,77 +1,48 @@
-import React, { Component } from 'react';
-import '../styles/App.css';
+import React from "react";
+import { BrowserRouter, Route, Link, Switch } from "react-router-dom";
+//CSS
+import "../styles/App.css";
+//Components
+import Header from "./Header.js";
+import Ads from "./Ads.js";
+import About from "./About.js";
+import Contact from "./Contact.js";
+import Chat from "./Chat.js";
+import Favorites from "./Favorites.js";
 
-class App extends Component {
-  /**
-   * annonser is an array of objects, this array is filled
-   * when initial fetch is fullfilled, until then it's an
-   * empty array
-   */
-  state = {
-    annonser: [],
-  }
-
-  /**
-   * componentDidMount runs when app starts, when page loads,
-   * built in function in react. This functions calls the
-   * function that fetches ads on load
-   */
-  componentDidMount() {
-    this.getAnnonser();
-  }
-
-  /**
-   * Regular fetch, but instead of saving to global variable, set
-   * the fetched data in state. The ads are nested inside of
-   * nested objects (matchningslista.matchningdata)
-   */
-  getAnnonser = () => {
-    fetch('http://api.arbetsformedlingen.se/af/v0/platsannonser/matchning?lanid=1&yrkesomradeid=3&antalrader=30')
-      .then(response => response.json())
-      .then((annonser) => {
-        this.setState({ annonser: annonser.matchningslista.matchningdata });
-      });
-  }
-
-  getOneAnnons = (annons) => {
-    console.log(annons);
-  }
-
-  render() {
-    /**
-     * Create an array of JSX-elements with the headline
-     * of each ad. Map or loop through the ads in state and
-     * create a new array, then render the array. airbnb
-     * demands that we destructure the data on line 42:
-     * https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
-     *
-     * key is needed on every created list item:
-     * https://reactjs.org/docs/lists-and-keys.html
-     *
-     * We need an anonymous callback function that wraps
-     * the 'onClick' if we need to send an argument to the
-     * function:
-     * https://reactjs.org/docs/handling-events.html#passing-arguments-to-event-handlers
-     * If we didn't send an argument we could write 'this.getOneAnnons'
-     */
-    const { annonser } = this.state;
-    const listOfAnnonser = annonser.map(annons => (
-      <div key={annons.annonsid}>
-        <p>
-          { annons.annonsrubrik }
-        </p>
-        <button type="button" onClick={() => this.getOneAnnons(annons)}>
-          Logga annons
-        </button>
-      </div>
-    ));
-
-    return (
+//legger inn browserRouter for å kunne navigere mellom ulike "sider"
+function App() {
+  return (
+    <BrowserRouter>
       <div>
-        { listOfAnnonser }
+        <nav className="navbar navbar-dark bg-dark justify-content-center">
+          <Link className="nav-link active" to="/">
+            Home
+          </Link>
+          <Link className="nav-link active" to="/Favorites">
+            Favorites
+          </Link>
+          <Link className="nav-link active" to="/About">
+            About
+          </Link>
+          <Link className="nav-link active" to="/Contact">
+            Contact
+          </Link>
+          <Link className="nav-link active" to="/Chat">
+            Chat
+          </Link>
+        </nav>
+        <Header />
+        <Switch>
+          <Route exact path="/" component={Ads} />
+          <Route path="/About" component={About} />
+          <Route path="/Contact" component={Contact} />
+          <Route path="/Chat" component={Chat} />
+          <Route path="/Favorites" component={Favorites} />
+        </Switch>
       </div>
-    );
-  }
+    </BrowserRouter>
+  );
 }
 
 export default App;
