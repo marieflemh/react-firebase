@@ -54,6 +54,7 @@ class Chat extends Component {
       });
   };
 
+  //update state when something is written in the input field
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
   };
@@ -61,10 +62,11 @@ class Chat extends Component {
   //push to database
   pushMessage = event => {
     event.preventDefault();
-    this.setState({ message: this.state.message });
+    this.setState({ message: "" });
     const inputData = {
       user: this.state.user.displayName,
-      message: this.state.message
+      message: this.state.message,
+      timestamp: new Date().getTime()
     };
     firebase
       .database()
@@ -72,13 +74,33 @@ class Chat extends Component {
       .push(inputData);
   };
 
+  //remove from database
+  removeMessage = removeMsg => {
+    firebase
+      .database()
+      .ref(`/messages/${removeMsg.key}`)
+      .remove();
+  };
+
+  //output
   showMessages = users => {
     return users.map(user1 => (
-      <div key={user1.uid} className="col-sm-6">
+      <div key={user1.uid} className="col-sm-4">
         <div className="card">
           <h5 className="card-header">{user1.user}</h5>
           <div className="card-body">
-            <p className="card-text"> {user1.message}</p>
+            <div className="card-text">
+              <p>{user1.message}</p>
+              <p>{new Date(user1.timestamp).toLocaleTimeString()}</p>
+            </div>
+            <hr className="my-2" />
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={() => this.removeMessage(user1)}
+            >
+              ta bort
+            </button>
           </div>
         </div>
       </div>
@@ -89,42 +111,69 @@ class Chat extends Component {
     const { users } = this.state;
     const allMessages = this.showMessages(users);
     return (
-      <div>
-        <div className="container">
-          {this.state.user ? (
-            <div>
-              <h1>Hello, {this.state.user.displayName}</h1>{" "}
-              <button onClick={this.logout}>Logout</button>
-              <form>
-                <div className="form-group">
-                  <input
-                    type="text"
-                    name="message"
-                    className="form-control"
-                    placeholder="Write a message"
-                    onChange={this.handleChange}
-                    value={this.state.message}
-                  />
+      <div className="container">
+        {this.state.user ? ( //if loggedin
+          <div className="row">
+            <div className="col-sm-6">
+              <div className="alert alert-success" role="alert">
+                <h4 className="alert-heading">
+                  Welcome, {this.state.user.displayName}
+                </h4>
+                <p>Write a comment</p>
+                <hr />
+                <div className="mb-o">
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={this.logout}
+                  >
+                    Logout
+                  </button>
                 </div>
-                <button
-                  type="submit"
-                  className="btn btn-primary mb-2"
-                  onClick={this.pushMessage}
-                >
-                  Send
-                </button>
-              </form>
-              <div className="container">
-                <p>{allMessages}</p>
               </div>
             </div>
-          ) : (
-            <div>
-              <h1>Login with Google</h1>
-              <button onClick={this.login}>Login</button>
+            <div className="col-sm-6">
+              <div className="input-group mb-3">
+                <textarea
+                  type="text"
+                  name="message"
+                  className="form-control"
+                  placeholder="Write a comment"
+                  rows="5"
+                  onChange={this.handleChange}
+                  value={this.state.message}
+                />
+
+                <div className="input-group-append">
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary"
+                    onClick={this.pushMessage}
+                  >
+                    Send
+                  </button>
+                </div>
+              </div>
             </div>
-          )}
-        </div>
+            <div className="container">
+              <hr className="my-4" />
+              <h2>User comments</h2>
+              <div className="row">{allMessages}</div>
+            </div>
+          </div>
+        ) : (
+          //else (if not loggedin)
+          <div>
+            <h2>Login with Google</h2>
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={this.login}
+            >
+              Login
+            </button>
+          </div>
+        )}
       </div>
     );
   }

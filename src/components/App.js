@@ -15,20 +15,20 @@ function App() {
   return (
     <BrowserRouter>
       <div>
-        <nav className="navbar navbar-dark bg-dark justify-content-center">
-          <Link className="nav-link active" to="/">
+        <nav className="navbar navbar-light bg-light justify-content-center">
+          <Link className="nav-link disabled" to="/">
             Home
           </Link>
-          <Link className="nav-link active" to="/Favorites">
+          <Link className="nav-link disabled" to="/Favorites">
             Favorites
           </Link>
-          <Link className="nav-link active" to="/About">
+          <Link className="nav-link disabled" to="/About">
             About
           </Link>
-          <Link className="nav-link active" to="/Contact">
+          <Link className="nav-link disabled" to="/Contact">
             Contact
           </Link>
-          <Link className="nav-link active" to="/Chat">
+          <Link className="nav-link disabled" to="/Chat">
             Chat
           </Link>
         </nav>
